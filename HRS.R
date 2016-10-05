@@ -24,7 +24,7 @@ transform_to_integer <- function(x, n) {
 # This function creates a plot which represents a function taking n different
 # values and increases/decreases waves times. 
 # For example, for a plot that increases and then decreases, waves = 2
-create_waves <- function(n, waves = 1, color = "firebrick1", location_top = T){
+create_waves <- function(n, waves = 1, color = "firebrick1", location_top = T, title){
     increasing_wave <- expand.grid(x = 1:n, y = 1:n) %>% mutate(fill = (y == x))
     decreasing_wave <- expand.grid(x = 1:n, y = 1:n) %>% mutate(fill = (y == n+1-x))
     
@@ -52,7 +52,7 @@ create_waves <- function(n, waves = 1, color = "firebrick1", location_top = T){
             scale_x_continuous(expand = c(0,0), trans = "reverse")
     }
 
-    g + geom_tile() + 
+    wave <- g + geom_tile() + 
         scale_fill_manual(values = c("white", color)) +
         scale_y_continuous(expand = c(0,0)) +
         theme(axis.text = element_blank(),
@@ -62,21 +62,26 @@ create_waves <- function(n, waves = 1, color = "firebrick1", location_top = T){
               legend.position = "none",
               panel.margin = unit(0, units = "cm"),
               plot.margin = unit(c(0,0,0,0), units = "cm"))
-        
+
+    if (location_top){
+        final <- grid.arrange(textGrob(title), wave, heights = unit(c(5,15),"mm"))
+    } else {
+        final <- grid.arrange(textGrob(title, rot = 90), 
+                              wave, 
+                              widths = unit(c(5,15), "mm"), 
+                              ncol = 2, newpage = T)
+    }
+    grid.newpage()
+    final
 }
-create_waves(7,5, "firebrick1", T)
 
 
 
 
-
-
-transform_to_integer(diamonds$cut, 5)
-transform_to_integer(diamonds$carat, 5)
 
 df <- diamonds
 var1 = "carat"
-n1 = 4
+n1 = 3
 var2 = "cut"
 n2 = 5
 target = "price"
@@ -111,18 +116,11 @@ main_g <- df2 %>%
           panel.margin = unit(0, units = "cm"),
           plot.margin = unit(c(0,0,0,0), units = "cm"))
 
-hlay <- rbind(c(NA,NA,1),
-              c(NA,NA,2),
-              c(3,4,5))
-grid.arrange(grobs=list(create_waves(n2,n1, "firebrick1", T),
-                        create_waves(n1,1, "dodgerblue", T),
-                        create_waves(n6,n5, "black", F),
-                        create_waves(n5,1, "grey", F),
-                        main_g), 
-             layout_matrix=hlay,
-             heights = unit(c(1,1,12), c("cm")),
-             widths = unit(c(1,1,18), c("cm")),
+top <- grid.arrange(create_waves(n2,n1, "firebrick1", T, var2),
+                    create_waves(n1,1, "dodgerblue", T, var1))
+left <- grid.arrange(create_waves(n6, n5, "skyblue4", F, var6),
+                    create_waves(n5,1, "aquamarine4", F, var5), ncol = 2)
+grid.arrange(textGrob(" "), top, left, main_g, ncol = 2,
+             heights = unit(c(4,12), c("cm")),
+             widths = unit(c(4,18), c("cm")),
              padding = 0)
-
-
-
