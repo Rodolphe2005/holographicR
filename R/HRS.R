@@ -5,7 +5,7 @@ library(gridExtra)
 library(grid)
 data(diamonds)
 
-# Transform a factor or numeric vector x to an integer vector taking values in ttt
+# Transform a factor or numeric vector x to an integer vector taking values in ttt2
 # 0, ..., n-1
 transform_to_integer <- function(x, n) {
     if (is.factor(x)){
